@@ -5,9 +5,9 @@ const Header = () => {
     
   <nav>
   <div className="nav-wrapper teal darken-3 ">
-    <a href="#" className="brand-logo center">TODO</a>
+    <a className="brand-logo center">TODO</a>
   </div>
-</nav>
+</nav> 
       
   )
 }

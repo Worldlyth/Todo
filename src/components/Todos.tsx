@@ -3,42 +3,62 @@ import TodoList from "./TodoList"
 import TodoNavigation from "./TodoNavigation"
 import "./todos.css"
 
-const Todos = () => {
-  const [todos, setTodos] = useState([])
-  const [title, setTitle] = useState("")
-  const [filter, setFilter] = useState("")
-  const [sort, setSort] = useState("")
-  const [filteredTodos, setFilteredTodos] = useState([])
+export interface Todo {
+  title: string
+  id: number
+  completed: boolean
+  index: number
+  creationDate: string
+}
+
+
+const Todos: React.FC = () => {
+  const [todos, setTodos] = useState<Todo[]>([])
+  const [title, setTitle] = useState<string>("")
+  const [filter, setFilter] = useState<string>("")
+  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([])
+  const [invisibility, setInvisibility] = useState (false) 
+  const [invisibleTodos, setInvisibleTodos] = useState<Todo[]> ([])
 
   useEffect(() => {
     let filteredTodos = todos.filter((todo) =>
+    
       todo.title.toLowerCase().includes(filter)
     )
     setFilteredTodos(filteredTodos)
   }, [todos, filter])
 
-  useEffect(() => {
-    
+  useEffect(()=> {
+    let invisibleTodos = filteredTodos.filter((todo)=> 
+      {
+        if (invisibility) {
+          return !todo.completed
+        } else {
+          return todo
+        }
+      }
+    )
+    setInvisibleTodos(invisibleTodos)
+  },[invisibility, filteredTodos])
 
-  }, [todos, sort])
-
-  const handleInput = (e) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
   }
 
-  const addTodo = (e) => {
+  const addTodo = (e: React.FormEvent) => {
     e.preventDefault()
     const newTodo = {
       title: title,
       id: Date.now(),
       completed: false,
       index: 1,
+      creationDate: new Date().toLocaleString()
     }
     setTodos((prev) => [...prev, newTodo])
     setTitle("")
   }
 
-  const toggleHandler = (id) => {
+  const toggleHandler = (id: number) => {
     setTodos(
       todos.map((todo) => {
         if (todo.id === id) {
@@ -49,7 +69,7 @@ const Todos = () => {
     )
   }
 
-  const removeHandler = (id) => {
+  const removeHandler = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id))
   }
 
@@ -67,23 +87,20 @@ const Todos = () => {
       </form>
 
       <h4 className="todos">TODO list</h4>
+
       <TodoNavigation
-        todos={todos}
         setTodos={setTodos}
         setFilter={setFilter}
         filter={filter}
-        sort={sort}
-        setSort={setSort}
+        invisibility={invisibility}
+        setInvisibility={setInvisibility}
       />
+
       <hr className="todos" />
 
-      {filteredTodos.length ? (
+      {invisibleTodos.length ? (
         <TodoList
-          className="todos"
-          todos={filteredTodos}
-          setTodos={setTodos}
-          title={title}
-          setTitle={setTitle}
+          todos={invisibleTodos}
           onToggle={toggleHandler}
           onRemove={removeHandler}
         />
